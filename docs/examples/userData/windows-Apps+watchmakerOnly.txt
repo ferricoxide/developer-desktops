@@ -1,0 +1,23 @@
+<powershell>
+$AppInstallUrl = "https://raw.githubusercontent.com/ferricoxide/developer-desktops/refs/heads/main/scripts/Windows/app-install.ps1"
+$PythonUrl = "https://www.python.org/ftp/python/3.14.2/python-3.14.2-amd64.exe"
+$PypiUrl = "https://pypi.org/simple"
+
+# Use TLS 1.2+
+[Net.ServicePointManager]::SecurityProtocol = "Tls12, Tls13"
+
+# Download app-installer file
+$AppInstallFile = "${Env:Temp}\$(${AppInstallUrl}.split('/')[-1])"
+(New-Object System.Net.WebClient).DownloadFile("$AppInstallUrl", "$AppInstallFile")
+
+# Use app-installer file to install python
+& "$AppInstallFile" -PythonUrl "$PythonUrl" -Verbose -ErrorAction Stop `
+  -ChromeUrl "https://dl.google.com/chrome/install/latest/chrome_installer.exe"
+
+# Install Watchmaker
+python -m pip install --index-url="$PypiUrl" --upgrade pip setuptools
+python -m pip install --index-url="$PypiUrl" --upgrade watchmaker
+
+# Run Watchmaker
+watchmaker --log-level debug --log-dir=C:\Watchmaker\Logs
+</powershell>
