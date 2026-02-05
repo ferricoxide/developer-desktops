@@ -1,6 +1,12 @@
 # https://hub.docker.com/_/microsoft-powershell and https://mcr.microsoft.com/v2/powershell/tags/list
 FROM mcr.microsoft.com/powershell:latest
 
+ARG MAX_ANALYZE_VERSION
+ENV MAX_ANALYZE_VERSION $MAX_ANALYZE_VERSION
+ARG MIN_ANALYZE_VERSION
+ENV MIN_ANALYZE_VERSION $MIN_ANALYZE_VERSION
+
+
 # Change the shell to use Powershell directly for our commands
 # instead of englobing them with pwsh -Command "MY_COMMAND"
 SHELL [ "pwsh", "-Command" ]
@@ -16,8 +22,8 @@ RUN \
     Install-Module \
       -ErrorAction Stop \
       -Name PSScriptAnalyzer    <# Name of modules to install from the online gallery #> \
-      -MinimumVersion 1.22.0    <# Set a floor-version #> \
-      -MaximumVersion 1.22.999  <# Set a ceiling-version #> \
+      -MinimumVersion $env:MIN_ANALYZE_VERSION <# Set a floor-version #> \
+      -MaximumVersion $env:MAX_ANALYZE_VERSION <# Set a ceiling-version #> \
       -Verbose;
 
 # Switch back to the default Linux shell as we are using a Linux Docker image for now
