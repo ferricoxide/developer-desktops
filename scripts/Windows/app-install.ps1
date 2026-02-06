@@ -124,7 +124,7 @@ function Fix-PS_CLI {
     [string]$NuGetMinVersion,
     [string]$PSReadLineMinVersion
   )
-  Install-Module -name NuGet -MinimumVersion "${NuGetMinVersion}" -Force | Out-Null
+  Install-PackageProvider -name NuGet -MinimumVersion "${NuGetMinVersion}" -Force | Out-Null
 
   # Update PowerShell ReadLine utility
   Install-Module `
@@ -335,9 +335,11 @@ if( ${AwsCliUrl} ) {
   Install-AWS_CLI
 }
 
-# Install Python
-Write-Verbose "Python will be installed from ${PythonUrl}"
-Install-Python
+# Conditionally Install Python
+if( ${PythonUrl} ) {
+  Write-Verbose "Python will be installed from ${PythonUrl}"
+  Install-Python
+}
 
 # Conditionally download and install Chrome
 if( ${ChromeUrl} ) {
