@@ -12,7 +12,16 @@ $AppInstallFile = "${Env:Temp}\$(${AppInstallUrl}.split('/')[-1])"
 
 # Use app-installer file to install python
 & "$AppInstallFile" -PythonUrl "$PythonUrl" -Verbose -ErrorAction Stop `
-  -ChromeUrl "https://dl.google.com/chrome/install/latest/chrome_installer.exe"
+    -AwsCliUrl "https://awscli.amazonaws.com/AWSCLIV2.msi" `
+    -ChromeUrl "https://dl.google.com/chrome/install/latest/chrome_installer.exe" `
+    -DBeaverUrl "https://dbeaver.io/files/dbeaver-ce-latest-x86_64-setup.exe" `
+    -FirefoxUrl "https://download.mozilla.org/?product=firefox-latest-ssl&os=win64&lang=en-US" `
+    -FluxUrl "https://github.com/fluxcd/flux2/releases/download/v2.7.5/flux_2.7.5_windows_amd64.zip" `
+    -GitUrl "https://github.com/git-for-windows/git/releases/download/v2.52.0.windows.1/Git-2.52.0-64-bit.exe" `
+    -K9sUrl "https://github.com/derailed/k9s/releases/download/v0.50.18/k9s_Windows_amd64.zip" `
+    -KubectlUrl "https://dl.k8s.io/v1.35.0/bin/windows/amd64/kubectl.exe" `
+    -NoSqlBoosterUrl "https://s3.nosqlbooster.com/download/releasesv10/nosqlbooster4mongo-10.1.1.exe"
+
 
 # Install Watchmaker
 python -m pip install --index-url="$PypiUrl" --upgrade pip setuptools
