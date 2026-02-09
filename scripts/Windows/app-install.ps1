@@ -94,6 +94,9 @@ function Install-Msi {
     $ret = Start-Process "msiexec.exe" -ArgumentList ${NewInstallerArgs} -NoNewWindow -PassThru -Wait
   }
 
+  # Try to ensure that the system-path actually gets updated for the MSI-instelled utility
+  $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
+
   return $ret
 }
 
