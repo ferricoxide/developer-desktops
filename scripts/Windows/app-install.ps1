@@ -113,12 +113,20 @@ function Expand-SysPath {
   Param(
     [String]$ExtraPathDir
   )
-    # Add executable to system path
-    [System.Environment]::SetEnvironmentVariable(
-      "Path",
-      $env:Path + ";${ExtraPathDir}",
-      [System.EnvironmentVariableTarget]::Machine
-    )
+
+  $RegKey = 'Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment'
+
+  # Add executable to system path ("registry" method)
+  $registryPath = (Get-Item $RegKey).GetValue('Path', $null, 'DoNotExpandEnvironmentNames')
+  Set-ItemProperty -Path $RegKey -Name "Path" -Value "$registryPath;${ExtraPathDir}"
+
+
+  # Add executable to system path (.Net method)
+  [System.Environment]::SetEnvironmentVariable(
+    "Path",
+    $env:Path + ";${ExtraPathDir}",
+    [System.EnvironmentVariableTarget]::Machine
+  )
 }
 
 function Fix-PS_CLI {
@@ -391,7 +399,7 @@ if( ${NoSqlBoosterUrl} ) {
 
 ## Reset-EnvironmentVarSet
 ## Write-Verbose "Reset the PATH environment for this shell"
-## 
+##
 ## if ("$Env:TEMP".TrimEnd("\") -eq "${Env:windir}\System32\config\systemprofile\AppData\Local\Temp") {
 ##   $Env:TEMP, $Env:TMP = "${Env:windir}\Temp", "${Env:windir}\Temp"
 ##   Write-Verbose "Forced TEMP envs to ${Env:windir}\Temp"
