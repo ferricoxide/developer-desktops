@@ -80,19 +80,18 @@ function Install-RootCertGroup {
 function Install-Msi {
   Param(
     [String]$Installer,
-    [String[]]$ExtraInstallerArgs,
-    [String[]]$NewInstallerArgs
+    [String[]]$ExtraInstallerArgs
   )
+
   $Arguments = @()
   $Arguments += "/i"
   $Arguments += "`"${Installer}`""
   $Arguments += $ExtraInstallerArgs
+
   Write-Verbose "Installing $Installer"
-  if ( $null -eq $NewInstallerArgs ) {
-    $ret = Start-Process "msiexec.exe" -ArgumentList ${Arguments} -NoNewWindow -PassThru -Wait
-  } else {
-    $ret = Start-Process "msiexec.exe" -ArgumentList ${NewInstallerArgs} -NoNewWindow -PassThru -Wait
-  }
+
+  Start-Process "msiexec.exe" -ArgumentList ${Arguments} -NoNewWindow -PassThru -Wait
+  $ret = $LASTEXITCODE
 
   # Try to ensure that the system-path actually gets updated for the MSI-instelled utility
   $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
@@ -162,10 +161,8 @@ function Install-AWS_CLI {
   Download-File -Url ${AwsCliUrl} -SavePath ${AwsCliFile}
 
   $Arguments = @()
-  $Arguments += "/jm"
-  $Arguments += "`"${Installer}`""
-  $Arguments += "/quiet"
-  Install-Msi -Installer ${AwsCliFile} -NewInstallerArgs ${Arguments}
+  $Arguments += "/passive"
+  Install-Msi -Installer ${AwsCliFile} -ExtraInstallerArgs ${Arguments}
 
   Write-Verbose "Installed AWS CLI v2"
 }
