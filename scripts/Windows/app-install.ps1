@@ -13,10 +13,13 @@ Param(
   [String]$RootCertUrl
 )
 
-$__ScriptName = "watchmaker-boostrap.ps1"
+$__ScriptName = "developer-apps-installer.ps1"
 
 # Location to save files.
 $SaveDir = ${Env:Temp}
+
+# Set a global bin-path "expander" variable
+$global:ExtraPaths = ""
 
 
 #################################
@@ -114,6 +117,7 @@ function Expand-SysPath {
     [String]$ExtraPathDir
   )
 
+  # Registry-hive key to update
   $RegKey = 'Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment'
 
   # Add executable to system path ("registry" method)
@@ -127,6 +131,10 @@ function Expand-SysPath {
     $env:Path + ";${ExtraPathDir}",
     [System.EnvironmentVariableTarget]::Machine
   )
+
+  # add EXE path to global "extra PATH" variable
+  $global:ExtraPaths = "${global:ExtraPaths};${ExtraPathDir}"
+
 }
 
 function Fix-PS_CLI {
@@ -396,5 +404,14 @@ if( ${NoSqlBoosterUrl} ) {
   Write-Verbose "NoSqlBooster will be installed from {$NoSqlBoosterUrl}"
   Install-NoSqlBooster
 }
+
+# Try to append naked EXE paths to system-path
+# Add executable to system path (.Net method)
+[System.Environment]::SetEnvironmentVariable(
+  "Path",
+  $env:Path + ";${global:ExtraPaths}",
+  [System.EnvironmentVariableTarget]::Machine
+)
+
 
 Write-Verbose "${__ScriptName} complete!"
