@@ -25,6 +25,26 @@ $global:ExtraPaths = ""
 #################################
 ## BEGIN: "Plumbing" functions ##
 ##                             ##
+function Cleanup-Download {
+  Param(
+    [string]$CleanupPath
+  )
+
+  # Check if cleanup-targe is a directory or a file
+  if ( Test-Path -Path '${CleanupPath}' -PathType Container ) {
+    Write-Verbose "Attempting to delete directory ${CleanupPath}..."
+    Remove-Item -Path "${CleanupPath}" -Recurse
+    $ret = $LASTEXITCODE
+  } else {
+    Write-Verbose "Attempting to delete file ${CleanupPath}..."
+    Remove-Item -Path "${CleanupPath}"
+    $ret = $LASTEXITCODE
+  }
+
+  # Return status from object-removal
+  return $ret
+}
+
 function Download-File {
   Param( [string]$Url, [string]$SavePath )
   # Download a file, if it doesn't already exist.
@@ -164,6 +184,7 @@ function Reset-EnvironmentVarSet {
     } | Set-Content -Path { "Env:$($_.Name)" }
   }
 }
+
 ##                             ##
 ## END: "Plumbing" functions   ##
 #################################
@@ -181,6 +202,9 @@ function Install-AWS_CLI {
   Install-Msi -Installer ${AwsCliFile} -ExtraInstallerArgs ${Arguments}
 
   Write-Verbose "Installed AWS CLI v2"
+
+  # Cleanup downloaded file
+  Cleanup-Download -CleanupPath "${AwsCliFile}"
 }
 
 function Install-Chrome {
