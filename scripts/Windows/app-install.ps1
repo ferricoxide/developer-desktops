@@ -221,6 +221,9 @@ function Install-Chrome {
   Write-Verbose "Executing Chrome installer, ${ChromeFile}..."
   Install-Exe -Installer ${ChromeFile} -ExtraInstallerArgs ${Arguments}
   Write-Verbose "Installed Chrome"
+
+  # Cleanup downloaded file
+  Cleanup-Download -CleanupPath "${ChromeFile}"
 }
 
 function Install-DBeaver {
@@ -236,6 +239,9 @@ function Install-DBeaver {
   Write-Verbose "Executing DBeaver installer, ${DBeaverFile}..."
   Install-Exe -Installer ${DBeaverFile} -ExtraInstallerArgs ${Arguments}
   Write-Verbose "Installed DBeaver"
+
+  # Cleanup downloaded file
+  Cleanup-Download -CleanupPath "${DBeaverFile}"
 }
 
 function Install-Firefox {
@@ -248,6 +254,9 @@ function Install-Firefox {
   Install-Exe -Installer ${FirefoxFile} -ExtraInstallerArgs ${Arguments}
 
   Write-Verbose "Installed Firefox"
+
+  # Cleanup downloaded file
+  Cleanup-Download -CleanupPath "${FirefoxFile}"
 }
 
 function Install-Flux {
@@ -264,6 +273,9 @@ function Install-Flux {
 
     # Add Flux executable to system path
     Expand-SysPath -ExtraPathDir ${FluxInstallDir}
+
+    # Cleanup downloaded file
+    Cleanup-Download -CleanupPath "${FluxFile}"
   }
 }
 
@@ -280,6 +292,9 @@ function Install-Git {
   Install-Exe -Installer ${GitFile} -ExtraInstallerArgs ${Arguments}
 
   Write-Verbose "Installed Git"
+
+  # Cleanup downloaded file
+  Cleanup-Download -CleanupPath "${GitFile}"
 }
 
 function Install-K9Util {
@@ -296,6 +311,9 @@ function Install-K9Util {
 
     # Add K9s executable to system path
     Expand-SysPath -ExtraPathDir ${K9sInstallDir}
+
+    # Cleanup downloaded file
+    Cleanup-Download -CleanupPath "${K9sFile}"
   }
 }
 
@@ -330,6 +348,9 @@ function Install-NoSqlBooster {
   Install-Exe -Installer ${NoSqlBoosterFile} -ExtraInstallerArgs ${Arguments}
 
   Write-Verbose "Installed NoSqlBooster"
+
+  # Cleanup downloaded file
+  Cleanup-Download -CleanupPath "${NoSqlBoosterFile}"
 }
 
 function Install-Python {
@@ -353,6 +374,9 @@ function Install-Python {
   }
 
   Write-Verbose "Installed Python"
+
+  # Cleanup downloaded file
+  Cleanup-Download -CleanupPath "${PythonFile}"
 }
 ##                                   ##
 ## END: User-Application functions   ##
