@@ -25,6 +25,26 @@ $global:ExtraPaths = ""
 #################################
 ## BEGIN: "Plumbing" functions ##
 ##                             ##
+function Cleanup-Download {
+  Param(
+    [string]$CleanupPath
+  )
+
+  # Check if cleanup-targe is a directory or a file
+  if ( Test-Path -Path '${CleanupPath}' -PathType Container ) {
+    Write-Verbose "Attempting to delete directory ${CleanupPath}..."
+    Remove-Item -Path "${CleanupPath}" -Recurse
+    $ret = $LASTEXITCODE
+  } else {
+    Write-Verbose "Attempting to delete file ${CleanupPath}..."
+    Remove-Item -Path "${CleanupPath}"
+    $ret = $LASTEXITCODE
+  }
+
+  # Return status from object-removal
+  return $ret
+}
+
 function Download-File {
   Param( [string]$Url, [string]$SavePath )
   # Download a file, if it doesn't already exist.
@@ -164,6 +184,7 @@ function Reset-EnvironmentVarSet {
     } | Set-Content -Path { "Env:$($_.Name)" }
   }
 }
+
 ##                             ##
 ## END: "Plumbing" functions   ##
 #################################
@@ -181,6 +202,9 @@ function Install-AWS_CLI {
   Install-Msi -Installer ${AwsCliFile} -ExtraInstallerArgs ${Arguments}
 
   Write-Verbose "Installed AWS CLI v2"
+
+  # Cleanup downloaded file
+  Cleanup-Download -CleanupPath "${AwsCliFile}"
 }
 
 function Install-Chrome {
@@ -197,6 +221,9 @@ function Install-Chrome {
   Write-Verbose "Executing Chrome installer, ${ChromeFile}..."
   Install-Exe -Installer ${ChromeFile} -ExtraInstallerArgs ${Arguments}
   Write-Verbose "Installed Chrome"
+
+  # Cleanup downloaded file
+  Cleanup-Download -CleanupPath "${ChromeFile}"
 }
 
 function Install-DBeaver {
@@ -212,6 +239,9 @@ function Install-DBeaver {
   Write-Verbose "Executing DBeaver installer, ${DBeaverFile}..."
   Install-Exe -Installer ${DBeaverFile} -ExtraInstallerArgs ${Arguments}
   Write-Verbose "Installed DBeaver"
+
+  # Cleanup downloaded file
+  Cleanup-Download -CleanupPath "${DBeaverFile}"
 }
 
 function Install-Firefox {
@@ -224,6 +254,9 @@ function Install-Firefox {
   Install-Exe -Installer ${FirefoxFile} -ExtraInstallerArgs ${Arguments}
 
   Write-Verbose "Installed Firefox"
+
+  # Cleanup downloaded file
+  Cleanup-Download -CleanupPath "${FirefoxFile}"
 }
 
 function Install-Flux {
@@ -240,6 +273,9 @@ function Install-Flux {
 
     # Add Flux executable to system path
     Expand-SysPath -ExtraPathDir ${FluxInstallDir}
+
+    # Cleanup downloaded file
+    Cleanup-Download -CleanupPath "${FluxFile}"
   }
 }
 
@@ -256,6 +292,9 @@ function Install-Git {
   Install-Exe -Installer ${GitFile} -ExtraInstallerArgs ${Arguments}
 
   Write-Verbose "Installed Git"
+
+  # Cleanup downloaded file
+  Cleanup-Download -CleanupPath "${GitFile}"
 }
 
 function Install-K9Util {
@@ -272,6 +311,9 @@ function Install-K9Util {
 
     # Add K9s executable to system path
     Expand-SysPath -ExtraPathDir ${K9sInstallDir}
+
+    # Cleanup downloaded file
+    Cleanup-Download -CleanupPath "${K9sFile}"
   }
 }
 
@@ -306,6 +348,9 @@ function Install-NoSqlBooster {
   Install-Exe -Installer ${NoSqlBoosterFile} -ExtraInstallerArgs ${Arguments}
 
   Write-Verbose "Installed NoSqlBooster"
+
+  # Cleanup downloaded file
+  Cleanup-Download -CleanupPath "${NoSqlBoosterFile}"
 }
 
 function Install-Python {
@@ -329,6 +374,9 @@ function Install-Python {
   }
 
   Write-Verbose "Installed Python"
+
+  # Cleanup downloaded file
+  Cleanup-Download -CleanupPath "${PythonFile}"
 }
 ##                                   ##
 ## END: User-Application functions   ##
