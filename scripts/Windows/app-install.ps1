@@ -162,7 +162,7 @@ function Fix-PS_CLI {
     [string]$NuGetMinVersion,
     [string]$PSReadLineMinVersion
   )
-  Install-PackageProvider -name NuGet -MinimumVersion "${NuGetMinVersion}" -Force | Out-Null
+  Install-PackageProvider -name NuGet -MinimumVersion "${NuGetMinVersion}" -Force
 
   # Update PowerShell ReadLine utility
   Install-Module `
@@ -202,6 +202,16 @@ function Create-User {
 
   # Create user from cmd_params hash-table
   New-LocalUser @cmd_params
+
+  # Ensure user has RDP permissions
+  Add-LocalGroupMember -Group "Remote Desktop Users" -Member "${UserUidName}"
+  Write-Host "${UserUidName} added to 'Remote Desktop Users' local group"
+
+  # Add as administrator if so requested
+  if ( $UserIsAdmin ) {
+    Add-LocalGroupMember -Group "Administrators" -Member "${UserUidName}"
+    Write-Host "${UserUidName} added to Administrators local group"
+  }
 }
 ##                             ##
 ## END: "Plumbing" functions   ##
