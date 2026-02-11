@@ -185,6 +185,24 @@ function Reset-EnvironmentVarSet {
   }
 }
 
+function Create-User {
+  Param(
+    [Parameter(Mandatory=$false)] [String]$UserFullName,
+    [Parameter(Mandatory=$true)] [String]$UserPasswd,
+    [Parameter(Mandatory=$true)] [String]$UserUidName,
+    [switch]$UserIsAdmin
+  )
+
+  $cmd_params = @{
+    Name        = "${UserUidName}"
+    Password    = ( ConvertTo-SecureString "${UserPasswd}" -AsPlainText -Force )
+    FullName    = "${UserFullName}"
+    Description = "Automatically created by ${__ScriptName}"
+  }
+
+  # Create user from cmd_params hash-table
+  New-LocalUser @cmd_params
+}
 ##                             ##
 ## END: "Plumbing" functions   ##
 #################################
