@@ -210,6 +210,11 @@ function Create-User {
   # Create user from cmd_params hash-table
   New-LocalUser @cmd_params
 
+  $LASTEXITCODE
+  if ( $LASTEXITCODE -ne 0 ) {
+    throw "User-creation failed with '$LASTEXITCODE' exit-code"
+  }
+
   # Ensure user has RDP permissions
   Add-LocalGroupMember -Group "Remote Desktop Users" -Member "${UserUidName}"
   Write-Host "${UserUidName} added to 'Remote Desktop Users' local group"
