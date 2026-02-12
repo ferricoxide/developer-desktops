@@ -2,12 +2,14 @@ Users:
   - jsmith:
       - givenName: John
         initialPassword: zuNuq21OnDM2TfUk
+        localAdmin: "true"
         organization: Finance
         sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCsFYH/direcmPFaxz8xXx0d4e6wyCP72JWBcC7Y/YQ/xyLw+MG2mFyuVvqrRdOI+LVw9IBo7WiMEs72ESM31Z5htGij3gH526tvvYzzdYiW5Lgz7zHBwBODd7P/TWy4ViaMhikHZsSJbdNAWOPgQFo8irVjkByJBbuSr9eVBHsOygSz/53+YzPKoQDhG1llfXlc39ytm4mN9uAd5rDvBQqjcQMTj8GlOMsvPd4pRlEGOcGCeAUpYjpnHoBLmeVd7aiz+rLEsgJJ3Axd9Tib06GHdFpwY8XKwDr0aKB8pZXNeNXZhFFo6LlBJXq7+gCk09NkyMvDcTyhsfPaa5H/V+z jsmith@dev.lab
         surname: Smith
     jserling:
       - givenName: Jane
         initialPassword: RT4KuHgUVZxwnXST
+        localAdmin: "false"
         organization: Marketing
         sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDc+WWmN8+xonpxrx0Eo9HgBAm32QqLjxy83gQArxajAvxG4HgrvSWElw2R4qasAS/3vl46qSvol27iV6+RtZldMKMfkoKksJCM0tZVehwnvvxbhaeXO13I120DhGVer59gFxuyiXmET3Dx7yQmxj+4xXJL+kadzyxKl2OVS//7uNAar0jHBGkR8TvmeIUP/wDtSUR4SQRoBO61ieeWE/K5htfsLN4EYFeP6hAPFZ5thXIfMcWb8C/uefk6MQIYrKv1jG4ImelLJB2m+I3M+dzUON0OyjgR1z6VHwxl0uvU58azNYp4MAeHJcfZ77EorNckw+X+kKMjrFg13LxkV/Gp jserling@dev.lab
         surname: Serling
