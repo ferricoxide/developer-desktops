@@ -188,11 +188,17 @@ function Reset-EnvironmentVarSet {
 function Create-User {
   Param(
     [Parameter(Mandatory=$false)] [String]$UserFullName,
-    [Parameter(Mandatory=$true)] [String]$UserPasswd,
-    [Parameter(Mandatory=$true)] [String]$UserUidName,
+    [Parameter(Mandatory=$false)] [String]$UserPasswd,
+    [Parameter(Mandatory=$true)]  [String]$UserUidName,
     [switch]$UserIsAdmin
   )
 
+  # Allow creation without a specifically-requested password-value
+  if ( ! $UserPasswd ) {
+    $UserPasswd = "4V3ryB@dP@ssw*rd"
+  }
+
+  # Create a "parameters" hasht-table
   $cmd_params = @{
     Name        = "${UserUidName}"
     Password    = ( ConvertTo-SecureString "${UserPasswd}" -AsPlainText -Force )
@@ -405,6 +411,39 @@ function Install-Python {
 
   # Cleanup downloaded file
   Cleanup-Download -CleanupPath "${PythonFile}"
+}
+
+function Parse-JsonFile {
+  param (
+      [Parameter(Mandatory = $true)]
+      [string]$JsonFilePath
+  )
+
+  # Abort if given file-path is not valid
+  if ( -not ( Test-Path $JsonFilePath ) ) {
+      Write-Error "File not found: $JsonFilePath"
+      return
+  }
+
+  # Load JSON-payload from file and convert to PS object
+  $JsonStream = Get-Content -Raw -Path "${JsonFilePath}" | ConvertFrom-Json
+
+  # The structure has a 'Users' array containing a single object with dynamic keys
+  foreach ($userContainer in $JsonStream.Users) {
+    # Iterate through each dynamic key (the usernames)
+    foreach ($username in $userContainer.psobject.Properties.Name) {
+      # Get the array associated with that username
+      $userDetails = $userContainer.$username
+
+      foreach ($detail in $userDetails) {
+	# Send extracted attributes to user-creation function
+	Create-User -UserUidName "$username" `
+	  -UserFullName "${detail}.givenName ${detail}.surname" `
+	  -UserPasswd "${detail}.initialPassword"
+      }
+    }
+  }
+
 }
 ##                                   ##
 ## END: User-Application functions   ##
