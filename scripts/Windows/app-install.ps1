@@ -210,11 +210,6 @@ function Create-User {
   # Create user from cmd_params hash-table
   New-LocalUser @cmd_params
 
-  $LASTEXITCODE
-  if ( $LASTEXITCODE -ne 0 ) {
-    throw "User-creation failed with '$LASTEXITCODE' exit-code"
-  }
-
   # Ensure user has RDP permissions
   Add-LocalGroupMember -Group "Remote Desktop Users" -Member "${UserUidName}"
   Write-Host "${UserUidName} added to 'Remote Desktop Users' local group"
@@ -443,14 +438,16 @@ function Parse-JsonFile {
       $userDetails = $userContainer.$username
 
       foreach ($detail in $userDetails) {
+	# Create "full name" attribute to user-creation function
+        $FullName = ${detail}.givenName + " " + ${detail}.surname
+
 	# Send extracted attributes to user-creation function
 	Create-User -UserUidName "$username" `
-	  -UserFullName "${detail}.givenName ${detail}.surname" `
-	  -UserPasswd "${detail}.initialPassword"
+	  -UserFullName ${FullName} `
+	  -UserPasswd ${detail}.initialPassword
       }
     }
   }
-
 }
 ##                                   ##
 ## END: User-Application functions   ##
