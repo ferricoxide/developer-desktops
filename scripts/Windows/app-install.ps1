@@ -441,12 +441,18 @@ function Parse-JsonFile {
         # Create "full name" attribute to user-creation function
         $FullName = ${detail}.givenName + " " + ${detail}.surname
 
-        # Send extracted attributes to user-creation function
-        if ( ${detail}.localAdmin == "true" ) {
+        # Safely set WantsAdmin in a Strict-mode safe way
+        if ( $detail.psobject.Properties.Name -contains "localAdmin" ) {
+          $WantsAdmin = ${detail}.localAdmin
+        } else {
+          $WantsAdmin = $null
+        }
+
+        if ( ${WantsAdmin} -eq "true" ) {
           Create-User -UserUidName "$username" `
             -UserFullName ${FullName} `
             -UserPasswd ${detail}.initialPassword `
-	    -UserIsAdmin
+            -UserIsAdmin
         } else {
           Create-User -UserUidName "$username" `
             -UserFullName ${FullName} `
