@@ -204,7 +204,7 @@ function Create-User {
     Name        = "${UserUidName}"
     Password    = ( ConvertTo-SecureString "${UserPasswd}" -AsPlainText -Force )
     FullName    = "${UserFullName}"
-    Description = "Automatically created by ${__ScriptName}"
+    Description = "Created by ${__ScriptName}"
   }
 
   # Create user from cmd_params hash-table
