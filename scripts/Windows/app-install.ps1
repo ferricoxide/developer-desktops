@@ -10,7 +10,8 @@ Param(
   [String]$KubectlUrl,
   [String]$NoSqlBoosterUrl,
   [String]$PythonUrl,
-  [String]$RootCertUrl
+  [String]$RootCertUrl,
+  [String]$UserCreationUrl
 )
 
 $__ScriptName = "developer-apps-installer.ps1"
@@ -414,19 +415,20 @@ function Install-Python {
 }
 
 function Parse-JsonFile {
-  param (
-      [Parameter(Mandatory = $true)]
-      [string]$JsonFilePath
-  )
+  # Where to write downloaded user-creation spec-file to
+  $UserCreationFile = "${SaveDir}\$(${UserCreationUrl}.split("/")[-1])"
+
+  # Download user-creation spec-file
+  Download-File -Url ${UserCreationUrl} -SavePath ${UserCreationFile}
 
   # Abort if given file-path is not valid
-  if ( -not ( Test-Path $JsonFilePath ) ) {
-      Write-Error "File not found: $JsonFilePath"
+  if ( -not ( Test-Path $UserCreationFile ) ) {
+      Write-Error "File not found: $UserCreationFile"
       return
   }
 
   # Load JSON-payload from file and convert to PS object
-  $JsonStream = Get-Content -Raw -Path "${JsonFilePath}" | ConvertFrom-Json
+  $JsonStream = Get-Content -Raw -Path "${UserCreationFile}" | ConvertFrom-Json
 
   # The structure has a 'Users' array containing a single object with dynamic keys
   foreach ($userContainer in $JsonStream.Users) {
@@ -519,6 +521,11 @@ if( ${NoSqlBoosterUrl} ) {
   Write-Verbose "NoSqlBooster will be installed from {$NoSqlBoosterUrl}"
   Install-NoSqlBooster
 }
+if( $UserCreationUrl ) {
+  Write-Verbose "User-creation will be based on data from ${UserCreationUrl}"
+  Parse-JsonFile
+}
+
 
 # Try to append naked EXE paths to system-path
 # Add executable to system path (.Net method)
