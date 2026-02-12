@@ -438,13 +438,20 @@ function Parse-JsonFile {
       $userDetails = $userContainer.$username
 
       foreach ($detail in $userDetails) {
-	# Create "full name" attribute to user-creation function
+        # Create "full name" attribute to user-creation function
         $FullName = ${detail}.givenName + " " + ${detail}.surname
 
-	# Send extracted attributes to user-creation function
-	Create-User -UserUidName "$username" `
-	  -UserFullName ${FullName} `
-	  -UserPasswd ${detail}.initialPassword
+        # Send extracted attributes to user-creation function
+        if ( ${detail}.localAdmin == "true" ) {
+          Create-User -UserUidName "$username" `
+            -UserFullName ${FullName} `
+            -UserPasswd ${detail}.initialPassword `
+	    -UserIsAdmin
+        } else {
+          Create-User -UserUidName "$username" `
+            -UserFullName ${FullName} `
+            -UserPasswd ${detail}.initialPassword
+        }
       }
     }
   }
