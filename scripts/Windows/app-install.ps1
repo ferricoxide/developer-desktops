@@ -419,7 +419,14 @@ function Parse-JsonFile {
   $UserCreationFile = "${SaveDir}\$(${UserCreationUrl}.split("/")[-1])"
 
   # Download user-creation spec-file
-  Download-File -Url ${UserCreationUrl} -SavePath ${UserCreationFile}
+  if (${UserCreationUrl} -match "^(http://|https://)") {
+    Download-File -Url ${UserCreationUrl} -SavePath ${UserCreationFile}
+  } elseif ( ${UserCreationUrl}.StartsWith("file://") ) {
+    copy $(${UserCreationUrl}.split("/")[-1]) "${UserCreationFile}"
+  } else {
+    Write-Host "Unspported URI specified. Exiting."
+    exit 1
+  }
 
   # Abort if given file-path is not valid
   if ( -not ( Test-Path $UserCreationFile ) ) {
