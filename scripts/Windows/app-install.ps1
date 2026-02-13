@@ -158,31 +158,6 @@ function Expand-SysPath {
 
 }
 
-function Fix-PS_CLI {
-  Param(
-    [string]$NuGetMinVersion,
-    [string]$PSReadLineMinVersion
-  )
-  if (  Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue ) {
-    Write-Verbose "NuGet is already installed"
-  } else {
-    Write-Verbose "Installing NuGet"
-    Install-PackageProvider -name NuGet -MinimumVersion "${NuGetMinVersion}" -Force
-  }
-
-  if ( (Get-Module PSReadLine).Version -ge [version]${PSReadLineMinVersion} ) {
-    Write-Verbose "PSReadLine is already installed"
-  } else {
-    # Update PowerShell ReadLine utility
-    Install-Module `
-     -Name PSReadLine `
-     -Repository PSGallery `
-     -MinimumVersion ${PSReadLineMinVersion} -Force
-
-    Write-Verbose "The PSReadLine module has been updated"
-  }
-}
-
 function Reset-EnvironmentVarSet {
   foreach( $Level in "Machine", "User" ) {
     [Environment]::GetEnvironmentVariables(${Level}).GetEnumerator() | ForEach-Object {
@@ -483,9 +458,6 @@ function Parse-JsonFile {
 #######################################
 
 # Main
-
-# Ensure Powershell's PSReadLine module is updated
-Fix-PS_CLI -NuGetMinVersion '2.8.5.201' -PSReadLineMinVersion '2.2.2'
 
 if( ${RootCertUrl} ) {
   # Download and install the root certificates.
