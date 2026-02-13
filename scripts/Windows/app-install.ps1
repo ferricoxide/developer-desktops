@@ -221,12 +221,12 @@ function Create-User {
 
   # Ensure user has RDP permissions
   Add-LocalGroupMember -Group "Remote Desktop Users" -Member "${UserUidName}"
-  Write-Host "${UserUidName} added to 'Remote Desktop Users' local group"
+  Write-Output "${UserUidName} added to 'Remote Desktop Users' local group"
 
   # Add as administrator if so requested
   if ( $UserIsAdmin ) {
     Add-LocalGroupMember -Group "Administrators" -Member "${UserUidName}"
-    Write-Host "${UserUidName} added to Administrators local group"
+    Write-Output "${UserUidName} added to Administrators local group"
   }
 }
 ##                             ##
@@ -433,7 +433,7 @@ function Parse-JsonFile {
   } elseif ( ${UserCreationUrl}.StartsWith("file://") ) {
     copy $(${UserCreationUrl}.split("/")[-1]) "${UserCreationFile}"
   } else {
-    Write-Host "Unspported URI specified. Exiting."
+    Write-Output "Unspported URI specified. Exiting."
     exit 1
   }
 
