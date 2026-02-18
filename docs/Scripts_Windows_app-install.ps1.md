@@ -55,7 +55,35 @@ For hosts that are able to download from public, Internet-hosted repositories, s
 
 ## User Creation
 
-As noted above, an arbitrary number of users may be created through this automation. The users' creation is specified through a JSON-formatted user-specification file (see: the [example](examples/support_files/RSA_Users.json) file)
+As noted above, an arbitrary number of users may be created through this automation. The users' creation is specified through a JSON-formatted user-specification file (see: the [example](examples/support_files/RSA_Users.json) file). The basic format of the specification-file is:
+
+```json
+{
+  "Users": [
+    {
+      "<USER_ID>": [
+        {
+          "givenName": "<USER_FIRST_NAME>",
+          "initialPassword": "<CLEARTEXT_PASSWORD_STRING>",
+          "localAdmin": "true",
+          "surname": "<USER_LAST_NAME>"
+        }
+      ]
+    }
+  ]
+}
+```
+
+The `<USER_ID>` object-key and the `givenName` and `surname` object-attributes are mandatory. The `initialPassword` and `localDamin` object-attributes are optional:
+
+* `<USER_ID>`: A string of (typically) between 8 and 20 alphanumeric characters
+* `givenName`: A string of ASCII characters matching the account-user's first name
+* `surName`: A string of ASCII characters matching the account-user's last name
+* `initialPassword`: A string of alphanumeric, ASCII characters of at least 8 character's length (14+ recommended). This string will be encrypted by the script when the user-account is created. If a value is not specified a default value will be set
+* `localAdmin`: A simple boolean. If the attribute is specified with a value of `true`, the user-account will be created as a local administrator. If the attribute is left unset or set to any value other than `true`, the user-account will be created only as an RDP-enabled user.
+
+The value of the specified `givenName` and `surName` values will be combined to create the user-account's full-name value.
+
 
 ## Cautions
 
