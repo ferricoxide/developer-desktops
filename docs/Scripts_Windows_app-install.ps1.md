@@ -18,6 +18,8 @@ None of the above components are installed without the script-user requesting th
 
 Additionally, the automation will set up an arbitrary set of locally-managed, RDP-enabled users. User-setup is requested by passing a further parameter-flag that points to a JSON-formatted user-specification file.
 
+If the capability to install further tooling is desired, pleas open an issue.
+
 ## Parameters
 
 The Windows (PowerShell) script, `app-install.ps1` currently accepts the following arguments:
@@ -50,6 +52,10 @@ For hosts that are able to download from public, Internet-hosted repositories, s
 * `NoSqlBoosterUrl`: [https://s3.nosqlbooster.com/download/releasesv10/nosqlbooster4mongo-10.1.1.exe](https://s3.nosqlbooster.com/download/releasesv10/nosqlbooster4mongo-10.1.1.exe)
 * `PythonUrl`: [https://www.python.org/ftp/python/3.14.2/python-3.14.2-amd64.exe](https://www.python.org/ftp/python/3.14.2/python-3.14.2-amd64.exe)
 * `UserCreationUrl`: Currently supports `http://`, `https://` or `file://` URIs.
+
+## User Creation
+
+As noted above, an arbitrary number of users may be created through this automation. The users' creation is specified through a JSON-formatted user-specification file (see: the [example](examples/support_files/RSA_Users.json) file)
 
 ## Cautions
 
