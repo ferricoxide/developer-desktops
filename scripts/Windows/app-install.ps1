@@ -10,7 +10,8 @@ Param(
   [String]$KubectlUrl,
   [String]$NoSqlBoosterUrl,
   [String]$PythonUrl,
-  [String]$RootCertUrl
+  [String]$RootCertUrl,
+  [String]$UserCreationUrl
 )
 
 $__ScriptName = "developer-apps-installer.ps1"
@@ -157,22 +158,6 @@ function Expand-SysPath {
 
 }
 
-function Fix-PS_CLI {
-  Param(
-    [string]$NuGetMinVersion,
-    [string]$PSReadLineMinVersion
-  )
-  Install-PackageProvider -name NuGet -MinimumVersion "${NuGetMinVersion}" -Force | Out-Null
-
-  # Update PowerShell ReadLine utility
-  Install-Module `
-   -Name PSReadLine `
-   -Repository PSGallery `
-   -MinimumVersion ${PSReadLineMinVersion} -Force
-
-  Write-Verbose "The PSReadLine module has been updated"
-}
-
 function Reset-EnvironmentVarSet {
   foreach( $Level in "Machine", "User" ) {
     [Environment]::GetEnvironmentVariables(${Level}).GetEnumerator() | ForEach-Object {
@@ -185,6 +170,40 @@ function Reset-EnvironmentVarSet {
   }
 }
 
+function Create-User {
+  Param(
+    [Parameter(Mandatory=$false)] [String]$UserFullName,
+    [Parameter(Mandatory=$false)] [String]$UserPasswd,
+    [Parameter(Mandatory=$true)]  [String]$UserUidName,
+    [switch]$UserIsAdmin
+  )
+
+  # Allow creation without a specifically-requested password-value
+  if ( ! $UserPasswd ) {
+    $UserPasswd = "4V3ryB@dP@ssw*rd"
+  }
+
+  # Create a "parameters" hasht-table
+  $cmd_params = @{
+    Name        = "${UserUidName}"
+    Password    = ( ConvertTo-SecureString "${UserPasswd}" -AsPlainText -Force )
+    FullName    = "${UserFullName}"
+    Description = "Created by ${__ScriptName}"
+  }
+
+  # Create user from cmd_params hash-table
+  New-LocalUser @cmd_params
+
+  # Ensure user has RDP permissions
+  Add-LocalGroupMember -Group "Remote Desktop Users" -Member "${UserUidName}"
+  Write-Output "${UserUidName} added to 'Remote Desktop Users' local group"
+
+  # Add as administrator if so requested
+  if ( $UserIsAdmin ) {
+    Add-LocalGroupMember -Group "Administrators" -Member "${UserUidName}"
+    Write-Output "${UserUidName} added to Administrators local group"
+  }
+}
 ##                             ##
 ## END: "Plumbing" functions   ##
 #################################
@@ -378,14 +397,67 @@ function Install-Python {
   # Cleanup downloaded file
   Cleanup-Download -CleanupPath "${PythonFile}"
 }
+
+function Parse-JsonFile {
+  # Where to write downloaded user-creation spec-file to
+  $UserCreationFile = "${SaveDir}\$(${UserCreationUrl}.split("/")[-1])"
+
+  # Download user-creation spec-file
+  if (${UserCreationUrl} -match "^(http://|https://)") {
+    Download-File -Url ${UserCreationUrl} -SavePath ${UserCreationFile}
+  } elseif ( ${UserCreationUrl}.StartsWith("file://") ) {
+    copy $(${UserCreationUrl}.split("/")[-1]) "${UserCreationFile}"
+  } else {
+    Write-Output "Unspported URI specified. Exiting."
+    exit 1
+  }
+
+  # Abort if given file-path is not valid
+  if ( -not ( Test-Path $UserCreationFile ) ) {
+      Write-Error "File not found: $UserCreationFile"
+      return
+  }
+
+  # Load JSON-payload from file and convert to PS object
+  $JsonStream = Get-Content -Raw -Path "${UserCreationFile}" | ConvertFrom-Json
+
+  # The structure has a 'Users' array containing a single object with dynamic keys
+  foreach ($userContainer in $JsonStream.Users) {
+    # Iterate through each dynamic key (the usernames)
+    foreach ($username in $userContainer.psobject.Properties.Name) {
+      # Get the array associated with that username
+      $userDetails = $userContainer.$username
+
+      foreach ($detail in $userDetails) {
+        # Create "full name" attribute to user-creation function
+        $FullName = ${detail}.givenName + " " + ${detail}.surname
+
+        # Safely set WantsAdmin in a Strict-mode safe way
+        if ( $detail.psobject.Properties.Name -contains "localAdmin" ) {
+          $WantsAdmin = ${detail}.localAdmin
+        } else {
+          $WantsAdmin = $null
+        }
+
+        if ( ${WantsAdmin} -eq "true" ) {
+          Create-User -UserUidName "$username" `
+            -UserFullName ${FullName} `
+            -UserPasswd ${detail}.initialPassword `
+            -UserIsAdmin
+        } else {
+          Create-User -UserUidName "$username" `
+            -UserFullName ${FullName} `
+            -UserPasswd ${detail}.initialPassword
+        }
+      }
+    }
+  }
+}
 ##                                   ##
 ## END: User-Application functions   ##
 #######################################
 
 # Main
-
-# Ensure Powershell's PSReadLine module is updated
-Fix-PS_CLI -NuGetMinVersion '2.8.5.201' -PSReadLineMinVersion '2.2.2'
 
 if( ${RootCertUrl} ) {
   # Download and install the root certificates.
@@ -452,6 +524,11 @@ if( ${NoSqlBoosterUrl} ) {
   Write-Verbose "NoSqlBooster will be installed from {$NoSqlBoosterUrl}"
   Install-NoSqlBooster
 }
+if( $UserCreationUrl ) {
+  Write-Verbose "User-creation will be based on data from ${UserCreationUrl}"
+  Parse-JsonFile
+}
+
 
 # Try to append naked EXE paths to system-path
 # Add executable to system path (.Net method)
