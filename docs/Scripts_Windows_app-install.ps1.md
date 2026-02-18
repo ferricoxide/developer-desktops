@@ -6,7 +6,7 @@ The [`app_install.ps1`](../scripts/Windows/app-install.ps1) file is a Powershell
 * The Chrome web browser
 * The dBeaver database managment GUI
 * The Firefox web broswer
-* The Flux CI/CD took for Kubernetes
+* The Flux CI/CD tool for Kubernetes
 * The Git source control management utility
 * The K9S Kubernetes management utility (TUI)
 * The Kubectl Kubernetes management utility (CLI)
@@ -51,7 +51,8 @@ For hosts that are able to download from public, Internet-hosted repositories, s
 * `KubectlUrl`: [https://dl.k8s.io/v1.35.0/bin/windows/amd64/kubectl.exe](https://dl.k8s.io/v1.35.0/bin/windows/amd64/kubectl.exe)
 * `NoSqlBoosterUrl`: [https://s3.nosqlbooster.com/download/releasesv10/nosqlbooster4mongo-10.1.1.exe](https://s3.nosqlbooster.com/download/releasesv10/nosqlbooster4mongo-10.1.1.exe)
 * `PythonUrl`: [https://www.python.org/ftp/python/3.14.2/python-3.14.2-amd64.exe](https://www.python.org/ftp/python/3.14.2/python-3.14.2-amd64.exe)
-* `UserCreationUrl`: Currently supports `http://`, `https://` or `file://` URIs.
+
+The `UserCreationUrl` parameter/flag currently supports URI-values prepended with `http://`, `https://` or `file://`
 
 ## Usage
 
@@ -147,12 +148,26 @@ Use the (example) userData-payload modifications specified in the main "Usage" s
     ```
     Immediately after the `-NoSqlBoosterUrl` parameter/value. If specifying paramter/values on individual lines, add the PowerShell line-continuation marker at the end of the `-NoSqlBoosterUrl` line.
 
+See the [example](examples/userData/HTTPS-hosted_json.ps1) userData-payload for clearer illustration of this section's guidance.
 
 ### User Creation &mdash; S3-Hosted
 
 "S3-Hosted" stands in for any given method that substitutes for a file-fetch from an anonymous HTTP/S-based URI.
 
-1. Nuke the
+1. Nuke the logic added for downloading the `$UserCreationUrl` file in the "HTTPS-hosted" section.
+2. Nuke the `-UserCreationUrl ...` content added in the "HTTPS-hosted" section
+3. Add logic for downloading the S3-hosted file after the first execution of the `app_install.ps1` script-file in the "HTTPS-hosted" section. This would be something like:
+    ```
+    aws s3 cp "${UserCreationUrl}" RSA_Users.json
+    ```
+4. Add a secondary run of the `app_install.ps1` script-file, this time only passing the `-UserCreationUrl` flag/parameter and a `file://...` URI pointing to the JSON file downloaded from S3 (e.g., something like):
+    ```
+    & "$AppInstallFile" -UserCreationUrl "file://RSA_Users.json"
+    ```
+
+Note: The double-invocation is necessary because the _first_ invocation makes the S3 CLI available for use by the _second_ invocation.
+
+See the [example](examples/userData/S3-hosted_json.ps1) userData-payload for clearer illustration of this section's guidance.
 
 ## Cautions
 

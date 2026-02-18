@@ -1,0 +1,54 @@
+<powershell>
+$BootstrapUrl = "https://watchmaker.cloudarmor.io/releases/latest/watchmaker-bootstrap.ps1"
+$AppInstallUrl = "https://raw.githubusercontent.com/ferricoxide/developer-desktops/refs/heads/Feature/AddUserCreation/scripts/Windows/app-install.ps1"
+$UserCreationUrl = "s3://p3-repository-testing/developer-desktops/rdp_users.json"
+$PythonUrl = "https://www.python.org/ftp/python/3.14.2/python-3.14.2-amd64.exe"
+$PypiUrl = "https://pypi.org/simple"
+
+# Use TLS 1.2+
+[Net.ServicePointManager]::SecurityProtocol = "Tls12, Tls13"
+
+# Download bootstrap file
+$BootstrapFile = "${Env:Temp}\$(${BootstrapUrl}.split('/')[-1])"
+(New-Object System.Net.WebClient).DownloadFile("$BootstrapUrl", "$BootstrapFile")
+
+# Download app-installer file
+$AppInstallFile = "${Env:Temp}\$(${AppInstallUrl}.split('/')[-1])"
+(New-Object System.Net.WebClient).DownloadFile("$AppInstallUrl", "$AppInstallFile")
+
+# Ensure PowerShell windows accept typed-in content
+Install-PackageProvider -name NuGet -Force
+Install-Module `
+  -Name PSReadLine `
+  -Repository PSGallery `
+  -Force
+
+# Install python
+& "$BootstrapFile" -PythonUrl "$PythonUrl" -Verbose -ErrorAction Stop
+
+# Use app-installer file to install python
+& "$AppInstallFile" `
+    -AwsCliUrl "https://awscli.amazonaws.com/AWSCLIV2.msi" `
+    -ChromeUrl "https://dl.google.com/chrome/install/latest/chrome_installer.exe" `
+    -DBeaverUrl "https://dbeaver.io/files/dbeaver-ce-latest-x86_64-setup.exe" `
+    -FirefoxUrl "https://download.mozilla.org/?product=firefox-latest-ssl&os=win64&lang=en-US" `
+    -FluxUrl "https://github.com/fluxcd/flux2/releases/download/v2.7.5/flux_2.7.5_windows_amd64.zip" `
+    -GitUrl "https://github.com/git-for-windows/git/releases/download/v2.52.0.windows.1/Git-2.52.0-64-bit.exe" `
+    -K9sUrl "https://github.com/derailed/k9s/releases/download/v0.50.18/k9s_Windows_amd64.zip" `
+    -KubectlUrl "https://dl.k8s.io/v1.35.0/bin/windows/amd64/kubectl.exe" `
+    -NoSqlBoosterUrl "https://s3.nosqlbooster.com/download/releasesv10/nosqlbooster4mongo-10.1.1.exe"
+
+# Download user-file
+aws s3 cp "${UserCreationUrl}" RSA_Users.json
+
+# Create local RDP users & admins
+& "$AppInstallFile" `
+    -UserCreationUrl "file://RSA_Users.json"
+
+# Install Watchmaker
+python -m pip install --index-url="$PypiUrl" --upgrade pip setuptools
+python -m pip install --index-url="$PypiUrl" --upgrade watchmaker
+
+# Run Watchmaker
+watchmaker --log-level debug --log-dir=C:\Watchmaker\Logs
+</powershell>
