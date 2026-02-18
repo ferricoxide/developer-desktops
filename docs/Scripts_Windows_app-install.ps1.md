@@ -1,3 +1,5 @@
+# Introduction
+
 The `app_install.ps1` file is a Powershell script designed to facilitate the installation of a set of common, developer-oriented tools. As of this writing, this script can automate the installation of the:
 
 * The AWS managment utility (CLI)
@@ -16,7 +18,7 @@ None of the above components are installed without the script-user requesting th
 
 Additionally, the automation will set up an arbitrary set of locally-managed, RDP-enabled users. User-setup is requested by passing a further parameter-flag that points to a JSON-formatted user-specification file.
 
-# Parameters
+## Parameters
 
 The Windows (PowerShell) script, `app-install.ps1` currently accepts the following arguments:
 
@@ -33,7 +35,7 @@ The Windows (PowerShell) script, `app-install.ps1` currently accepts the followi
 * `RootCertUrl: Download location for a bundle of private root-certifications.
 * `UserCreationUrl`: The URI of a user-specification file.
 
-# Values
+## Values
 
 For hosts that are able to download from public, Internet-hosted repositories, suitable link-values will (as of the writing of this document) be:
 
@@ -49,7 +51,7 @@ For hosts that are able to download from public, Internet-hosted repositories, s
 * `PythonUrl`: [https://www.python.org/ftp/python/3.14.2/python-3.14.2-amd64.exe](https://www.python.org/ftp/python/3.14.2/python-3.14.2-amd64.exe)
 * `UserCreationUrl`: Currently supports `http://`, `https://` or `file://` URIs.
 
-# Cautions
+## Cautions
 
 * Failing to specify a value will result in the associated application **_not_** being installed.
 * Specifying a non-valid value will typically result in the automation aborting.
