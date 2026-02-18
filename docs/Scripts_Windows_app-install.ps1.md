@@ -53,7 +53,57 @@ For hosts that are able to download from public, Internet-hosted repositories, s
 * `PythonUrl`: [https://www.python.org/ftp/python/3.14.2/python-3.14.2-amd64.exe](https://www.python.org/ftp/python/3.14.2/python-3.14.2-amd64.exe)
 * `UserCreationUrl`: Currently supports `http://`, `https://` or `file://` URIs.
 
-## User Creation
+## Usage
+
+The automation in this project is expected to be used as part of userData payload managed via tools like [`cloud-init`](https://cloud-init.io/), [`EC2Launch`](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2launch-v2.html), etc. This particular script is intended for use with &mdash; and has been tested against &mdash; the EC2Launch (v2) agent.
+
+EC2Launch is an agent used to automate tasks during the launch of a Windows-based EC2. The general format of a generic, userData payload used with EC2Lanuch is:
+
+```
+<PowerShell>
+
+  <POWERSHELL_DEFINED_TASK_1>
+  <POWERSHELL_DEFINED_TASK_2>
+  ...
+  <POWERSHELL_DEFINED_TASK_N>
+
+</PowerShell>
+```
+
+This script's launch was tested using a userData-payload similar to that described in the watchmaker project's Windows-Usage section (see: [link](https://watchmaker.readthedocs.io/en/stable/usage.html#windows). The primary differnce in the tested userData-payload
+ and the watchmaker-described userData-payload is:
+
+1. The addition of a `$AppInstallUrl` variable pointing to the HTTPS-url of `app_install.ps1` script in this git repository
+2. The addition of a `$UserCreationUrl` variable pointing to an appropriate URI
+3. Duplication of the download-logic for the `$BootstrapFile` to pull down the `app_install.ps1` script via the `$AppInstallUrl` variable
+4. Invocation of the `app_install.ps1` script immediately after the original watchmaker script's `# Install python` block and before the `# Install watchmaker` block. For example:
+    ```
+    [...elided...]
+
+    # Install python
+    & "$BootstrapFile" -PythonUrl "$PythonUrl" -Verbose -ErrorAction Stop
+
+    # Use app-installer file to install python
+    & "$AppInstallFile" `
+        -AwsCliUrl "https://awscli.amazonaws.com/AWSCLIV2.msi" `
+        -ChromeUrl "https://dl.google.com/chrome/install/latest/chrome_installer.exe" `
+        -DBeaverUrl "https://dbeaver.io/files/dbeaver-ce-latest-x86_64-setup.exe" `
+        -FirefoxUrl "https://download.mozilla.org/?product=firefox-latest-ssl&os=win64&lang=en-US" `
+        -FluxUrl "https://github.com/fluxcd/flux2/releases/download/v2.7.5/flux_2.7.5_windows_amd64.zip" `
+        -GitUrl "https://github.com/git-for-windows/git/releases/download/v2.52.0.windows.1/Git-2.52.0-64-bit.exe" `
+        -K9sUrl "https://github.com/derailed/k9s/releases/download/v0.50.18/k9s_Windows_amd64.zip" `
+        -KubectlUrl "https://dl.k8s.io/v1.35.0/bin/windows/amd64/kubectl.exe" `
+        -NoSqlBoosterUrl "https://s3.nosqlbooster.com/download/releasesv10/nosqlbooster4mongo-10.1.1.exe" `
+        -UserCreationUrl "https://raw.githubusercontent.com/ferricoxide/developer-desktops/refs/heads/main/docs/examples/support_files/RSA_Users.json"
+
+    # Install Watchmaker
+    python -m pip install --index-url="$PypiUrl" --upgrade pip setuptools
+    python -m pip install --index-url="$PypiUrl" --upgrade watchmaker
+
+    [...elided...]
+    ```
+
+### User Creation
 
 As noted above, an arbitrary number of users may be created through this automation. The users' creation is specified through a JSON-formatted user-specification file (see: the [example](examples/support_files/RSA_Users.json) file). The basic format of the specification-file is:
 
