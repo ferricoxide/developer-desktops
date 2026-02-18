@@ -1,6 +1,6 @@
 # Introduction
 
-The `app_install.ps1` file is a Powershell script designed to facilitate the installation of a set of common, developer-oriented tools. As of this writing, this script can automate the installation of the:
+The [`app_install.ps1`](../scripts/Windows/app-install.ps1) file is a Powershell script designed to facilitate the installation of a set of common, developer-oriented tools. As of this writing, this script can automate the installation of the:
 
 * The AWS managment utility (CLI)
 * The Chrome web browser
