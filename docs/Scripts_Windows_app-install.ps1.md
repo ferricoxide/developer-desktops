@@ -89,3 +89,4 @@ The value of the specified `givenName` and `surName` values will be combined to 
 
 * Failing to specify a value will result in the associated application **_not_** being installed.
 * Specifying a non-valid value will typically result in the automation aborting.
+* If running the script so as to create additional RDP users, it is recommended to place the user-specification in a protected location (password-protected HTTP/S URL, an S3-hosted file, etc.). This recommendation is due to the use of cleartext strings for the specification-file's user-password field(s)
