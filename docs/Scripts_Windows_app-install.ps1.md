@@ -70,6 +70,7 @@ EC2Launch is an agent used to automate tasks during the launch of a Windows-base
 </PowerShell>
 ```
 
+
 This script's launch was tested using a userData-payload similar to that described in the watchmaker project's Windows-Usage section (see: [link](https://watchmaker.readthedocs.io/en/stable/usage.html#windows). The primary differnce in the tested userData-payload
  and the watchmaker-described userData-payload is:
 
@@ -93,8 +94,7 @@ This script's launch was tested using a userData-payload similar to that describ
         -GitUrl "https://github.com/git-for-windows/git/releases/download/v2.52.0.windows.1/Git-2.52.0-64-bit.exe" `
         -K9sUrl "https://github.com/derailed/k9s/releases/download/v0.50.18/k9s_Windows_amd64.zip" `
         -KubectlUrl "https://dl.k8s.io/v1.35.0/bin/windows/amd64/kubectl.exe" `
-        -NoSqlBoosterUrl "https://s3.nosqlbooster.com/download/releasesv10/nosqlbooster4mongo-10.1.1.exe" `
-        -UserCreationUrl "https://raw.githubusercontent.com/ferricoxide/developer-desktops/refs/heads/main/docs/examples/support_files/RSA_Users.json"
+        -NoSqlBoosterUrl "https://s3.nosqlbooster.com/download/releasesv10/nosqlbooster4mongo-10.1.1.exe"
 
     # Install Watchmaker
     python -m pip install --index-url="$PypiUrl" --upgrade pip setuptools
@@ -103,9 +103,9 @@ This script's launch was tested using a userData-payload similar to that describ
     [...elided...]
     ```
 
-### User Creation
+### User Creation &mdash; Notes:
 
-As noted above, an arbitrary number of users may be created through this automation. The users' creation is specified through a JSON-formatted user-specification file (see: the [example](examples/support_files/RSA_Users.json) file). The basic format of the specification-file is:
+As noted previously, an arbitrary number of users may be created through this automation. The users' creation is specified through a JSON-formatted user-specification file (see: the [example](examples/support_files/RSA_Users.json) file). The basic format of the specification-file is:
 
 ```json
 {
@@ -134,9 +134,28 @@ The `<USER_ID>` object-key and the `givenName` and `surname` object-attributes a
 
 The value of the specified `givenName` and `surName` values will be combined to create the user-account's full-name value.
 
+### User Creation &mdash; HTTPS-Hosted
+
+Use the (example) userData-payload modifications specified in the main "Usage" section, with the further modifications:
+
+1. Add download-logic for the user-specification file. This would be akin to the further logic added for downloading the `app_install.ps1` script-file.
+2. Add the `UserCreationUrl` flag/parameter and associated value to the prior section's  `app_install.ps1` script-invocation:
+
+    ```
+    -UserCreationUrl "https://raw.githubusercontent.com/ferricoxide/developer-desktops/refs/heads/main/docs/examples/support_files/RSA_Users.json"
+
+    ```
+    Immediately after the `-NoSqlBoosterUrl` parameter/value. If specifying paramter/values on individual lines, add the PowerShell line-continuation marker at the end of the `-NoSqlBoosterUrl` line.
+
+
+### User Creation &mdash; S3-Hosted
+
+"S3-Hosted" stands in for any given method that substitutes for a file-fetch from an anonymous HTTP/S-based URI.
+
+1. Nuke the
 
 ## Cautions
 
-* Failing to specify a value will result in the associated application **_not_** being installed.
-* Specifying a non-valid value will typically result in the automation aborting.
-* If running the script so as to create additional RDP users, it is recommended to place the user-specification in a protected location (password-protected HTTP/S URL, an S3-hosted file, etc.). This recommendation is due to the use of cleartext strings for the specification-file's user-password field(s)
+* Failing to specify an application's flag/value will result in the associated application **_not_** being installed.
+* Specifying a non-valid value for a flag will typically result in the automation aborting.
+* If running the script so as to create additional RDP users, it is recommended to place the user-specification file in a protected location (password-protected HTTP/S URL, an S3-hosted file, etc.). This recommendation is due to the use of cleartext strings for the specification-file's user-password field(s)
