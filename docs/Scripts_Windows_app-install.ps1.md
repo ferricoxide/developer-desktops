@@ -1,3 +1,21 @@
+The `app_install.ps1` file is a Powershell script designed to facilitate the installation of a set of common, developer-oriented tools. As of this writing, this script can automate the installation of the:
+
+* The AWS managment utility (CLI)
+* The Chrome web browser
+* The dBeaver database managment GUI
+* The Firefox web broswer
+* The Flux CI/CD took for Kubernetes
+* The Git source control management utility
+* The K9S Kubernetes management utility (TUI)
+* The Kubectl Kubernetes management utility (CLI)
+* The NoSQLBoster IDE for MongoDB
+* The Python language
+* Optional/Additional root certificate authories
+
+None of the above components are installed without the script-user requesting their installation. Installation-request is done by passing a parameter-flag and an associated value.
+
+Additionally, the automation will set up an arbitrary set of locally-managed, RDP-enabled users. User-setup is requested by passing a further parameter-flag that points to a JSON-formatted user-specification file.
+
 # Parameters
 
 The Windows (PowerShell) script, `app-install.ps1` currently accepts the following arguments:
@@ -13,6 +31,7 @@ The Windows (PowerShell) script, `app-install.ps1` currently accepts the followi
 * `NoSqlBoosterUrl`: Download location for the NoSQLBooster GUI utility's (EXE-based) installer
 * `PythonUrl`: Download location for the Python interpreter-suite. May be delivered as either an EXE- or MSI-based installer
 * `RootCertUrl: Download location for a bundle of private root-certifications.
+* `UserCreationUrl`: The URI of a user-specification file.
 
 # Values
 
@@ -28,8 +47,9 @@ For hosts that are able to download from public, Internet-hosted repositories, s
 * `KubectlUrl`: [https://dl.k8s.io/v1.35.0/bin/windows/amd64/kubectl.exe](https://dl.k8s.io/v1.35.0/bin/windows/amd64/kubectl.exe)
 * `NoSqlBoosterUrl`: [https://s3.nosqlbooster.com/download/releasesv10/nosqlbooster4mongo-10.1.1.exe](https://s3.nosqlbooster.com/download/releasesv10/nosqlbooster4mongo-10.1.1.exe)
 * `PythonUrl`: [https://www.python.org/ftp/python/3.14.2/python-3.14.2-amd64.exe](https://www.python.org/ftp/python/3.14.2/python-3.14.2-amd64.exe)
+* `UserCreationUrl`: Currently supports `http://`, `https://` or `file://` URIs.
 
 # Cautions
 
-* Failing to specify a value will result in the application not being installed.
+* Failing to specify a value will result in the associated application **_not_** being installed.
 * Specifying a non-valid value will typically result in the automation aborting.
