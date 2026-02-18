@@ -7,7 +7,5 @@ This project is intended to act as a repository of tooling for building "develop
 
 Further, this project will contain Dockerfiles suitable to help in the linting of the above automation-types
 
-For examples on how to use this project's automation examine the files in the [docs/examples/userData](docs/examples/userData) directory. Files in this directory may be used "as is" or as "inspiration". If used "as is":
+See the [`app-install.ps1` documentation](docs/Scripts_Windows_app-install.ps1.md) for guidance on how to use the Windows, PowerShell-based automation.
 
-* Copy-n-paste their content into the launcher-GUI's userData input-box
-* Download the desired file(s) to the launcher-CLI's host and used a `file://`-based userData reference to the (local) download-path
