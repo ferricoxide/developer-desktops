@@ -381,6 +381,9 @@ function Install-NotepadPlusPlus {
   # Call the correct installer-type based on download's extension
   if ($NotepadPlusPlusFile -like "*.exe") {
     Write-Host "Action: Running the EXE installer..."
+    # Append further optoins to install-arguments
+    $Arguments = @()
+    $Arguments += "/S"
 
     Install-Exe -Installer ${NotepadPlusPlusFile} -ExtraInstallerArgs ${Arguments}
 
