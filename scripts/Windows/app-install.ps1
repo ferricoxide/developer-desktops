@@ -9,6 +9,7 @@ Param(
   [String]$K9sUrl,
   [String]$KubectlUrl,
   [String]$NoSqlBoosterUrl,
+  [String]$NotepadPlusPlusUrl,
   [String]$PythonUrl,
   [String]$RootCertUrl,
   [String]$UserCreationUrl
@@ -370,6 +371,36 @@ function Install-NoSqlBooster {
 
   # Cleanup downloaded file
   Cleanup-Download -CleanupPath "${NoSqlBoosterFile}"
+}
+
+function Install-NotepadPlusPlus {
+  $NotepadPlusPlusFile = "${SaveDir}\$(${NotepadPlusPlusUrl}.split("/")[-1])"
+
+  Download-File -Url ${NotepadPlusPlusUrl} -SavePath ${NotepadPlusPlusFile}
+
+  # Call the correct installer-type based on download's extension
+  if ($NotepadPlusPlusFile -like "*.exe") {
+    Write-Host "Action: Running the EXE installer..."
+
+    Install-Exe -Installer ${NotepadPlusPlusFile} -ExtraInstallerArgs ${Arguments}
+
+    Write-Verbose "Installed NotepadPlusPlus"
+  } elseif ($NotepadPlusPlusFile -like "*.msi") {
+    Write-Host "Action: Running the MSI installer via msiexec..."
+
+    # Append further optoins to install-arguments
+    $Arguments = @()
+    $Arguments += "/qn"
+    $Arguments += "/norestart"
+    $Arguments += "ALLUSERS=1"
+
+    # Call MSI-installer function
+    Install-Msi -Installer ${NotepadPlusPluFile} -ExtraInstallerArgs ${Arguments}
+
+    Write-Verbose "Installed NotepadPlusPlus"
+  } else {
+    Write-Host "Action: Unknown file type. No installation logic defined."
+  }
 }
 
 function Install-Python {
