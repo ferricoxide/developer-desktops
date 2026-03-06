@@ -1,0 +1,15 @@
+{
+    "Users": [
+        {
+            "thjones2": [
+                {
+                    "givenName": "Thomas",
+                    "initialPassword": "Ch@ng3M3N*w",
+                    "localAdmin": "true",
+                    "organization": "Cloud Team",
+                    "surname": "Jones"
+                }
+            ]
+        }
+    ]
+}

@@ -1,7 +1,7 @@
 <powershell>
 $BootstrapUrl = "https://watchmaker.cloudarmor.io/releases/latest/watchmaker-bootstrap.ps1"
-$AppInstallUrl = "https://raw.githubusercontent.com/ferricoxide/developer-desktops/refs/heads/main/scripts/Windows/app-install.ps1"
-$UserCreationUrl = "s3://thj2-tracss-wrangler-tfstate/DevDesktop/thj2.json"
+$AppInstallUrl = "https://raw.githubusercontent.com/ferricoxide/developer-desktops/refs/heads/Feature/AddUserCreation/scripts/Windows/app-install.ps1"
+$UserCreationUrl = "https://raw.githubusercontent.com/ferricoxide/developer-desktops/refs/heads/Feature/AddUserCreation/docs/examples/support_files/RSA_Users.json"
 $PythonUrl = "https://www.python.org/ftp/python/3.14.2/python-3.14.2-amd64.exe"
 $PypiUrl = "https://pypi.org/simple"
 
@@ -16,17 +16,14 @@ $BootstrapFile = "${Env:Temp}\$(${BootstrapUrl}.split('/')[-1])"
 $AppInstallFile = "${Env:Temp}\$(${AppInstallUrl}.split('/')[-1])"
 (New-Object System.Net.WebClient).DownloadFile("$AppInstallUrl", "$AppInstallFile")
 
-# Ensure PowerShell windows accept typed-in content
-Install-PackageProvider -name NuGet -Force
-Install-Module `
-  -Name PSReadLine `
-  -Repository PSGallery `
-  -Force
+# Download user-creation spec-file
+$UserCreationFile = "${Env:Temp}\$(${UserCreationUrl}.split('/')[-1])"
+(New-Object System.Net.WebClient).DownloadFile("$UserCreationUrl", "$UserCreationFile")
 
 # Install python
 & "$BootstrapFile" -PythonUrl "$PythonUrl" -Verbose -ErrorAction Stop
 
-# Use app-installer file to install python
+## # Use app-installer file to install python
 & "$AppInstallFile" `
     -AwsCliUrl "https://awscli.amazonaws.com/AWSCLIV2.msi" `
     -ChromeUrl "https://dl.google.com/chrome/install/latest/chrome_installer.exe" `
@@ -36,19 +33,10 @@ Install-Module `
     -GitUrl "https://github.com/git-for-windows/git/releases/download/v2.52.0.windows.1/Git-2.52.0-64-bit.exe" `
     -K9sUrl "https://github.com/derailed/k9s/releases/download/v0.50.18/k9s_Windows_amd64.zip" `
     -KubectlUrl "https://dl.k8s.io/v1.35.0/bin/windows/amd64/kubectl.exe" `
-    -NoSqlBoosterUrl "https://s3.nosqlbooster.com/download/releasesv10/nosqlbooster4mongo-10.1.1.exe"
-
-# Download user-file
-aws s3 cp "${UserCreationUrl}" RSA_Users.json
-
-# Create local RDP users & admins
-& "$AppInstallFile" `
-    -UserCreationUrl "file://RSA_Users.json"
+    -NoSqlBoosterUrl "https://s3.nosqlbooster.com/download/releasesv10/nosqlbooster4mongo-10.1.1.exe" `
+    -UserCreationUrl "https://raw.githubusercontent.com/ferricoxide/developer-desktops/refs/heads/Feature/AddUserCreation/docs/examples/support_files/RSA_Users.json"
 
 # Install Watchmaker
 python -m pip install --index-url="$PypiUrl" --upgrade pip setuptools
 python -m pip install --index-url="$PypiUrl" --upgrade watchmaker
-
-# Run Watchmaker
-watchmaker --log-level debug --log-dir=C:\Watchmaker\Logs
 </powershell>

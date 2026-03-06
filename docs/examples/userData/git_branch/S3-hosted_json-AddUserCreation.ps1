@@ -1,7 +1,7 @@
 <powershell>
 $BootstrapUrl = "https://watchmaker.cloudarmor.io/releases/latest/watchmaker-bootstrap.ps1"
-$AppInstallUrl = "https://raw.githubusercontent.com/ferricoxide/developer-desktops/refs/heads/main/scripts/Windows/app-install.ps1"
-$UserCreationUrl = "s3://thj2-tracss-wrangler-tfstate/DevDesktop/thj2.json"
+$AppInstallUrl = "https://raw.githubusercontent.com/ferricoxide/developer-desktops/refs/heads/Feature/AddUserCreation/scripts/Windows/app-install.ps1"
+$UserCreationUrl = "s3://p3-repository-testing/developer-desktops/rdp_users.json"
 $PythonUrl = "https://www.python.org/ftp/python/3.14.2/python-3.14.2-amd64.exe"
 $PypiUrl = "https://pypi.org/simple"
 

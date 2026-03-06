@@ -1,0 +1,35 @@
+function Get-JsonUserData {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$Path
+    )
+
+    if (-not (Test-Path $Path)) {
+        Write-Error "File not found: $Path"
+        return
+    }
+
+    # Load and parse the JSON file
+    $jsonContent = Get-Content -Raw -Path $Path | ConvertFrom-Json
+
+    # The structure has a 'Users' array containing a single object with dynamic keys
+    foreach ($userContainer in $jsonContent.Users) {
+        # Iterate through each dynamic key (the usernames)
+        foreach ($username in $userContainer.psobject.Properties.Name) {
+            # Get the array associated with that username
+            $userDetails = $userContainer.$username
+
+            foreach ($detail in $userDetails) {
+                # Construct a clean custom object for output
+                [PSCustomObject]@{
+                    Username     = $username
+                    GivenName    = $detail.givenName
+                    Surname      = $detail.surname
+                    Organization = $detail.organization
+                    PublicKey    = $detail.sshPublicKey
+                }
+            }
+        }
+    }
+}
