@@ -9,6 +9,7 @@ Param(
   [String]$K9sUrl,
   [String]$KubectlUrl,
   [String]$NoSqlBoosterUrl,
+  [String]$NotepadPlusPlusUrl,
   [String]$PythonUrl,
   [String]$RootCertUrl,
   [String]$UserCreationUrl
@@ -372,6 +373,39 @@ function Install-NoSqlBooster {
   Cleanup-Download -CleanupPath "${NoSqlBoosterFile}"
 }
 
+function Install-NotepadPlusPlus {
+  $NotepadPlusPlusFile = "${SaveDir}\$(${NotepadPlusPlusUrl}.split("/")[-1])"
+
+  Download-File -Url ${NotepadPlusPlusUrl} -SavePath ${NotepadPlusPlusFile}
+
+  # Call the correct installer-type based on download's extension
+  if ($NotepadPlusPlusFile -like "*.exe") {
+    Write-Host "Action: Running the EXE installer..."
+    # Append further optoins to install-arguments
+    $Arguments = @()
+    $Arguments += "/S"
+
+    Install-Exe -Installer ${NotepadPlusPlusFile} -ExtraInstallerArgs ${Arguments}
+
+    Write-Verbose "Installed NotepadPlusPlus"
+  } elseif ($NotepadPlusPlusFile -like "*.msi") {
+    Write-Host "Action: Running the MSI installer via msiexec..."
+
+    # Append further optoins to install-arguments
+    $Arguments = @()
+    $Arguments += "/qn"
+    $Arguments += "/norestart"
+    $Arguments += "ALLUSERS=1"
+
+    # Call MSI-installer function
+    Install-Msi -Installer ${NotepadPlusPlusFile} -ExtraInstallerArgs ${Arguments}
+
+    Write-Verbose "Installed NotepadPlusPlus"
+  } else {
+    Write-Host "Action: Unknown file type. No installation logic defined."
+  }
+}
+
 function Install-Python {
   $PythonFile = "${SaveDir}\$(${PythonUrl}.split("/")[-1])"
 
@@ -524,11 +558,18 @@ if( ${NoSqlBoosterUrl} ) {
   Write-Verbose "NoSqlBooster will be installed from {$NoSqlBoosterUrl}"
   Install-NoSqlBooster
 }
+
+# Conditionally download and install NotepadPlusPlus
+if( ${NotepadPlusPlusUrl} ) {
+  Write-Verbose "NotepadPlusPlus will be installed from {$NotepadPlusPlusUrl}"
+  Install-NotepadPlusPlus
+}
+
+# Conditionally perform creation of additional local RDP users
 if( $UserCreationUrl ) {
   Write-Verbose "User-creation will be based on data from ${UserCreationUrl}"
   Parse-JsonFile
 }
-
 
 # Try to append naked EXE paths to system-path
 # Add executable to system path (.Net method)
