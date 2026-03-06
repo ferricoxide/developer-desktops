@@ -395,7 +395,7 @@ function Install-NotepadPlusPlus {
     $Arguments += "ALLUSERS=1"
 
     # Call MSI-installer function
-    Install-Msi -Installer ${NotepadPlusPluFile} -ExtraInstallerArgs ${Arguments}
+    Install-Msi -Installer ${NotepadPlusPlusFile} -ExtraInstallerArgs ${Arguments}
 
     Write-Verbose "Installed NotepadPlusPlus"
   } else {
@@ -555,11 +555,18 @@ if( ${NoSqlBoosterUrl} ) {
   Write-Verbose "NoSqlBooster will be installed from {$NoSqlBoosterUrl}"
   Install-NoSqlBooster
 }
+
+# Conditionally download and install NotepadPlusPlus
+if( ${NotepadPlusPlusUrl} ) {
+  Write-Verbose "NotepadPlusPlus will be installed from {$NotepadPlusPlusUrl}"
+  Install-NotepadPlusPlus
+}
+
+# Conditionally perform creation of additional local RDP users
 if( $UserCreationUrl ) {
   Write-Verbose "User-creation will be based on data from ${UserCreationUrl}"
   Parse-JsonFile
 }
-
 
 # Try to append naked EXE paths to system-path
 # Add executable to system path (.Net method)
