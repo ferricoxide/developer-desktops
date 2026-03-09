@@ -11,6 +11,7 @@ Param(
   [String]$NoSqlBoosterUrl,
   [String]$NotepadPlusPlusUrl,
   [String]$PythonUrl,
+  [String]$RedisInsightsUrl,
   [String]$RootCertUrl,
   [String]$UserCreationUrl
 )
@@ -406,6 +407,22 @@ function Install-NotepadPlusPlus {
   }
 }
 
+function Install-RedisInsights {
+  $RedisInsightsFile = "${SaveDir}\$(${RedisInsightsUrl}.split("/")[-1])"
+
+  Download-File -Url ${RedisInsightsUrl} -SavePath ${RedisInsightsFile}
+
+  Write-Host "Action: Running the EXE installer..."
+  # Append further optoins to install-arguments
+  $Arguments = @()
+  $Arguments += "/S"
+  $Arguments += "/allusers"
+
+  Install-Exe -Installer ${RedisInsightsFile} -ExtraInstallerArgs ${Arguments}
+
+  Write-Verbose "Installed RedisInsights"
+}
+
 function Install-Python {
   $PythonFile = "${SaveDir}\$(${PythonUrl}.split("/")[-1])"
 
@@ -563,6 +580,12 @@ if( ${NoSqlBoosterUrl} ) {
 if( ${NotepadPlusPlusUrl} ) {
   Write-Verbose "NotepadPlusPlus will be installed from {$NotepadPlusPlusUrl}"
   Install-NotepadPlusPlus
+}
+
+# Conditionally download and install REDIS Insights tool
+if( ${RedisInsightsUrl} ) {
+  Write-Verbose "RedisInsights will be installed from {$RedisInsightsUrl}"
+  Install-RedisInsights
 }
 
 # Conditionally perform creation of additional local RDP users
