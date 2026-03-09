@@ -417,9 +417,9 @@ function Install-RedisInsights {
   $Arguments = @()
   $Arguments += "/S"
 
-  Install-Exe -Installer ${NotepadPlusPlusFile} -ExtraInstallerArgs ${Arguments}
+  Install-Exe -Installer ${RedisInsightsFile} -ExtraInstallerArgs ${Arguments}
 
-  Write-Verbose "Installed NotepadPlusPlus"
+  Write-Verbose "Installed RedisInsights"
 }
 
 function Install-Python {
