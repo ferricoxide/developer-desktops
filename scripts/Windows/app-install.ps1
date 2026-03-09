@@ -416,6 +416,7 @@ function Install-RedisInsights {
   # Append further optoins to install-arguments
   $Arguments = @()
   $Arguments += "/S"
+  $Arguments += "/allusers"
 
   Install-Exe -Installer ${RedisInsightsFile} -ExtraInstallerArgs ${Arguments}
 
